@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Card } from '../components/ui/card/Card'
 
 export const Route = createFileRoute('/')({ component: App })
 
@@ -34,36 +35,13 @@ function App() {
         </div>
       </section>
 
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          [
-            'Type-Safe Routing',
-            'Routes and links stay in sync across every page.',
-          ],
-          [
-            'Server Functions',
-            'Call server code from your UI without creating API boilerplate.',
-          ],
-          [
-            'Streaming by Default',
-            'Ship progressively rendered responses for faster experiences.',
-          ],
-          [
-            'Tailwind Native',
-            'Design quickly with utility-first styling and reusable tokens.',
-          ],
-        ].map(([title, desc], index) => (
-          <article
-            key={title}
-            className="island-shell feature-card rise-in rounded-2xl p-5"
-            style={{ animationDelay: `${index * 90 + 80}ms` }}
-          >
-            <h2 className="mb-2 text-base font-semibold text-[var(--sea-ink)]">
-              {title}
-            </h2>
-            <p className="m-0 text-sm text-[var(--sea-ink-soft)]">{desc}</p>
-          </article>
-        ))}
+      <section className="mt-8 p-6 sm:p-8">
+        <p className="island-kicker mb-2">Example Card</p>
+        <Card
+        title="Example Card" 
+        content="315 PH/S" 
+        description="network" 
+        />
       </section>
 
       <section className="island-shell mt-8 rounded-2xl p-6">
