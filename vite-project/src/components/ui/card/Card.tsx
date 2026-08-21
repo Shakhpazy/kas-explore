@@ -6,9 +6,10 @@ interface CardProps {
   icon2?: ElementType;
   content?: string;
   description?: string;
+  summary?: string;
 }
 
-export function Card({ title, icon1: Icon1, icon2: Icon2, content, description }: CardProps) {
+export function Card({ title, icon1: Icon1, icon2: Icon2, content, description, summary }: CardProps) {
     return (
         <div className="rounded-lg border border-border bg-card p-4 text-center text-card-foreground shadow-sm">
             <div className="mb-2 flex items-center justify-center gap-2">
