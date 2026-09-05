@@ -5,9 +5,13 @@ Welcome to your new TanStack Start app!
 To run this application:
 
 ```bash
+nvm install
+nvm use
 npm install
 npm run dev
 ```
+
+This project requires Node.js 22.12.0 or newer. If you do not use `nvm`, install a supported Node.js version before running the commands above.
 
 # Building For Production
 
