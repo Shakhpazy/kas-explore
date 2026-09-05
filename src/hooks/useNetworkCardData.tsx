@@ -1,5 +1,12 @@
-import { useEffect, useState } from 'react'
-import { useNetworkCoinsupply, useNetworkHalving, useNetworkHashrate } from './useNetwork'
+import { useEffect, useRef, useState } from 'react'
+import {
+  useNetworkCoinsupply,
+  useNetworkHalving,
+  useNetworkHashrate,
+  useNetworkKaspad,
+  useNetworkBlockReward,
+  useNetworkBlueScore,
+} from './useNetwork'
 
 export interface NetworkCardData {
   title: string
@@ -48,7 +55,9 @@ function formatCoinSupply(value?: CoinSupplyData): FormattedCoinSupply {
   const circulatingSupply = Number(value.circulatingSupply)
   const maxSupply = Number(value.maxSupply)
   const minedPercentage =
-    Number.isFinite(circulatingSupply) && Number.isFinite(maxSupply) && maxSupply > 0
+    Number.isFinite(circulatingSupply) &&
+    Number.isFinite(maxSupply) &&
+    maxSupply > 0
       ? `${((circulatingSupply / maxSupply) * 100).toFixed(2)}%`
       : 'Unavailable'
 
@@ -114,9 +123,32 @@ export function useNetworkCardData() {
   const networkHalving = useNetworkHalving()
   const [now, setNow] = useState(() => Date.now())
   const networkHashrate = useNetworkHashrate()
+  const kaspad = useNetworkKaspad()
+  const reward = useNetworkBlockReward()
+  const blueScore = useNetworkBlueScore()
+  const samples = useRef<Array<{ score: number; time: number }>>([])
+  const [bps, setBps] = useState<number | null>(null)
+
+  useEffect(() => {
+    const score = blueScore.data?.blueScore
+    const time = blueScore.dataUpdatedAt
+    if (score === undefined || !time || blueScore.isError) return
+    const previous = samples.current.at(-1)
+    if (previous?.time === time) return
+    if (previous && (score < previous.score || time - previous.time > 90_000)) {
+      samples.current = []
+      setBps(null)
+    }
+    samples.current = [
+      ...samples.current.filter((sample) => time - sample.time <= 60_000),
+      { score, time },
+    ]
+    const first = samples.current[0]
+    if (time > first.time)
+      setBps((score - first.score) / ((time - first.time) / 1000))
+  }, [blueScore.data, blueScore.dataUpdatedAt, blueScore.isError])
   const coinSupplyData = formatCoinSupply(coinsupply.data)
 
-  
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 60_000)
 
@@ -124,7 +156,6 @@ export function useNetworkCardData() {
   }, [])
 
   const halvingData = formatHalving(networkHalving.data, now)
-
 
   const cards: NetworkCardData[] = [
     {
@@ -147,7 +178,49 @@ export function useNetworkCardData() {
       description: 'Network',
       isPending: networkHashrate.isPending,
       isError: networkHashrate.isError,
-    }
+    },
+    {
+      title: 'Mempool',
+      content: kaspad.data
+        ? Number(kaspad.data.mempoolSize).toLocaleString('en-US')
+        : '—',
+      description:
+        kaspad.data?.isSynced === false
+          ? 'API node is syncing'
+          : 'Pending transactions · API node',
+      isPending: kaspad.isPending,
+      isError: kaspad.isError,
+    },
+    {
+      title: 'Block reward',
+      content: reward.data
+        ? `${reward.data.blockreward.toLocaleString('en-US', { maximumFractionDigits: 4 })} KAS`
+        : '—',
+      description: 'Current subsidy per block',
+      isPending: reward.isPending,
+      isError: reward.isError,
+    },
+    {
+      title: 'Live BPS (est.)',
+      content: bps === null ? 'Measuring…' : bps.toFixed(2),
+      description: 'Current',
+      isPending: blueScore.isPending,
+      isError: blueScore.isError,
+    },
+    {
+      title: 'Network nodes',
+      content: 'Unavailable',
+      description: 'Network-wide count needs a node census',
+      isPending: false,
+      isError: false,
+    },
+    {
+      title: 'Miners',
+      content: 'Unavailable',
+      description: 'No network-wide miner count source',
+      isPending: false,
+      isError: false,
+    },
   ]
 
   return { cards }

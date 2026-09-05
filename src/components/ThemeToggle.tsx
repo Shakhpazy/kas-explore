@@ -1,81 +1,70 @@
 import { useEffect, useState } from 'react'
+import { Moon, Sun } from 'lucide-react'
 
 type ThemeMode = 'light' | 'dark' | 'auto'
-
-function getInitialMode(): ThemeMode {
-  if (typeof window === 'undefined') {
+function readMode(): ThemeMode {
+  try {
+    const stored = window.localStorage.getItem('theme')
+    return stored === 'light' || stored === 'dark' ? stored : 'auto'
+  } catch {
     return 'auto'
   }
-
-  const stored = window.localStorage.getItem('theme')
-  if (stored === 'light' || stored === 'dark' || stored === 'auto') {
-    return stored
-  }
-
-  return 'auto'
 }
-
-function applyThemeMode(mode: ThemeMode) {
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  const resolved = mode === 'auto' ? (prefersDark ? 'dark' : 'light') : mode
-
-  document.documentElement.classList.remove('light', 'dark')
-  document.documentElement.classList.add(resolved)
-
-  if (mode === 'auto') {
-    document.documentElement.removeAttribute('data-theme')
-  } else {
-    document.documentElement.setAttribute('data-theme', mode)
-  }
-
-  document.documentElement.style.colorScheme = resolved
+function apply(mode: ThemeMode) {
+  const dark =
+    mode === 'dark' ||
+    (mode === 'auto' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches)
+  document.documentElement.classList.toggle('dark', dark)
+  document.documentElement.classList.toggle('light', !dark)
+  if (mode === 'auto') document.documentElement.removeAttribute('data-theme')
+  else document.documentElement.setAttribute('data-theme', mode)
+  document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+  return dark
 }
-
 export default function ThemeToggle() {
-  const [mode, setMode] = useState<ThemeMode>('auto')
-
+  const [isDark, setIsDark] = useState(false)
   useEffect(() => {
-    const initialMode = getInitialMode()
-    setMode(initialMode)
-    applyThemeMode(initialMode)
-  }, [])
-
-  useEffect(() => {
-    if (mode !== 'auto') {
-      return
-    }
-
+    const sync = () => setIsDark(apply(readMode()))
     const media = window.matchMedia('(prefers-color-scheme: dark)')
-    const onChange = () => applyThemeMode('auto')
-
-    media.addEventListener('change', onChange)
-    return () => {
-      media.removeEventListener('change', onChange)
+    const onSystemChange = () => {
+      if (!document.documentElement.hasAttribute('data-theme')) sync()
     }
-  }, [mode])
-
-  function toggleMode() {
-    const nextMode: ThemeMode =
-      mode === 'light' ? 'dark' : mode === 'dark' ? 'auto' : 'light'
-    setMode(nextMode)
-    applyThemeMode(nextMode)
-    window.localStorage.setItem('theme', nextMode)
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === 'theme' || event.key === null) sync()
+    }
+    sync()
+    media.addEventListener('change', onSystemChange)
+    window.addEventListener('storage', onStorage)
+    return () => {
+      media.removeEventListener('change', onSystemChange)
+      window.removeEventListener('storage', onStorage)
+    }
+  }, [])
+  const toggle = () => {
+    const value = document.documentElement.classList.contains('dark')
+      ? 'light'
+      : 'dark'
+    setIsDark(apply(value))
+    try {
+      window.localStorage.setItem('theme', value)
+    } catch {
+      // Switching still works when browser storage is unavailable.
+    }
   }
-
-  const label =
-    mode === 'auto'
-      ? 'Theme mode: auto (system). Click to switch to light mode.'
-      : `Theme mode: ${mode}. Click to switch mode.`
-
   return (
     <button
       type="button"
-      onClick={toggleMode}
-      aria-label={label}
-      title={label}
-      className="rounded-full border border-[var(--chip-line)] bg-[var(--chip-bg)] px-3 py-1.5 text-sm font-semibold text-[var(--sea-ink)] shadow-[0_8px_22px_rgba(30,90,72,0.08)] transition hover:-translate-y-0.5"
+      onClick={toggle}
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+      title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+      className="grid size-9 place-items-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--ink-muted)] hover:text-[var(--ink)]"
     >
-      {mode === 'auto' ? 'Auto' : mode === 'dark' ? 'Dark' : 'Light'}
+      {isDark ? (
+        <Sun className="size-4" aria-hidden="true" />
+      ) : (
+        <Moon className="size-4" aria-hidden="true" />
+      )}
     </button>
   )
 }
