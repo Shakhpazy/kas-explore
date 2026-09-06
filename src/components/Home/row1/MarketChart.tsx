@@ -127,7 +127,7 @@ export function MarketChart() {
             />
             <Metric label="Data points" value={String(marketData.length)} />
           </div>
-          <div className="mt-6 min-h-44 flex-1">
+          <div className="mt-6 h-44 min-h-[176px] flex-1">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={marketData}
@@ -246,16 +246,18 @@ function Metric({
 
 function MarketSkeleton() {
   return (
-    <div className="animate-pulse">
-      <div className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-4">
+    <div className="animate-pulse min-h-[370px]">
+
+      <div className="mt-6 grid grid-cols-2 gap-x-5 gap-y-4 sm:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <div key={index}>
+          <div key={index} className="space-y-2">
             <div className="h-3 w-16 rounded bg-[var(--surface-subtle)]" />
-            <div className="mt-2 h-5 w-20 rounded bg-[var(--surface-subtle)]" />
+            <div className="h-5 w-20 rounded bg-[var(--surface-subtle)]" />
           </div>
         ))}
       </div>
-      <div className="mt-6 h-44 rounded-xl bg-[var(--surface-subtle)]" />
+
+      <div className="mt-6 h-100 rounded-xl border border-[var(--line)] bg-[var(--surface-subtle)]" />
     </div>
   )
 }

@@ -257,14 +257,28 @@ function ActivityChart({
 
 function ActivitySkeleton() {
   return (
-    <div className="grid gap-5 lg:grid-cols-2">
-      {['transactions', 'addresses'].map((name) => (
-        <div key={name} className="panel min-h-[365px] animate-pulse p-6">
-          <div className="h-9 w-48 rounded bg-[var(--surface-subtle)]" />
-          <div className="mt-7 h-14 rounded bg-[var(--surface-subtle)]" />
-          <div className="mt-6 h-44 rounded bg-[var(--surface-subtle)]" />
+    <div className="panel animate-pulse min-h-[365px] p-5 sm:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--surface-subtle)]" />
+          <div className="space-y-2">
+            <div className="h-5 w-28 rounded bg-[var(--surface-subtle)]" />
+            <div className="h-3 w-32 rounded bg-[var(--surface-subtle)]" />
+          </div>
         </div>
-      ))}
+        <div className="h-9 w-16 rounded-lg border border-[var(--line)] bg-[var(--surface-subtle)]" />
+      </div>
+
+      <div className="mt-7 grid grid-cols-2 gap-4">
+        {Array.from({ length: 2 }, (_, index) => (
+          <div key={index} className="space-y-2">
+            <div className="h-3 w-16 rounded bg-[var(--surface-subtle)]" />
+            <div className="h-6 w-20 rounded bg-[var(--surface-subtle)]" />
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 h-44 rounded-xl border border-[var(--line)] bg-[var(--surface-subtle)]" />
     </div>
   )
 }
