@@ -29,7 +29,8 @@ export function useKaspaLive({ paused = false }: { paused?: boolean } = {}) {
     queryFn: getLiveNetworkData,
     staleTime: 8_000,
     refetchInterval: paused ? false : 10_000,
-    retry: 1,
+    retry: true,
+    retryDelay: (attempt) => Math.min(1_000 * 2 ** attempt, 10_000),
   })
 
   useEffect(() => {
@@ -47,8 +48,10 @@ export function useKaspaLive({ paused = false }: { paused?: boolean } = {}) {
   }, [query.data])
 
   return {
-    status: query.isError
-      ? ('offline' as const)
+    status: query.isFetching && !query.data
+      ? ('connecting' as const)
+      : query.isError
+        ? ('offline' as const)
       : query.isSuccess
         ? ('live' as const)
         : ('connecting' as const),

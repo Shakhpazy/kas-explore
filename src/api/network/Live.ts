@@ -177,7 +177,7 @@ export async function getLiveNetworkData(): Promise<LiveNetworkData> {
     .map(string)
     .filter((hash): hash is string => Boolean(hash))
     .slice(0, BLOCK_LIMIT)
-  const blocks = await Promise.all(
+  const blockResults = await Promise.allSettled(
     hashes.map(async (hash) => {
       const { data } = await axios.get(`${BASE_URL}/blocks/${hash}`, {
         timeout: 10_000,
@@ -185,6 +185,16 @@ export async function getLiveNetworkData(): Promise<LiveNetworkData> {
       return parseBlock(hash, data)
     }),
   )
+  const blocks = blockResults
+    .filter(
+      (result): result is PromiseFulfilledResult<ReturnType<typeof parseBlock>> =>
+        result.status === 'fulfilled',
+    )
+    .map((result) => result.value)
+
+  if (blocks.length === 0) {
+    throw new Error('No current BlockDAG tips could be loaded.')
+  }
 
   const totals = blocks.reduce(
     (total, entry) => {

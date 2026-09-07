@@ -84,10 +84,7 @@ export function TransactionRowData() {
   if (metrics.isError || !metrics.current) {
     return (
       <section className="address-history-message mt-6 text-[var(--danger)]">
-        Transaction metrics could not be loaded.
-        <button type="button" onClick={() => void metrics.refetch()}>
-          Try again
-        </button>
+        Transaction metrics are reconnecting…
       </section>
     )
   }
