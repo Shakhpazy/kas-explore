@@ -246,7 +246,7 @@ function Metric({
 
 function MarketSkeleton() {
   return (
-    <div className="animate-pulse min-h-[370px]">
+    <div className="skeleton-panel min-h-[370px]">
 
       <div className="mt-6 grid grid-cols-2 gap-x-5 gap-y-4 sm:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (

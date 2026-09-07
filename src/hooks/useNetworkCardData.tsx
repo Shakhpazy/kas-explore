@@ -208,6 +208,22 @@ export function useNetworkCardData() {
       isError: blueScore.isError,
     },
     {
+      title: 'Blue score',
+      content: blueScore.data
+        ? blueScore.data.blueScore.toLocaleString('en-US')
+        : '—',
+      description: 'Virtual chain',
+      isPending: blueScore.isPending,
+      isError: blueScore.isError,
+    },
+    {
+      title: 'Node status',
+      content: kaspad.data?.isSynced ? 'Synced' : 'Syncing',
+      description: 'API node',
+      isPending: kaspad.isPending,
+      isError: kaspad.isError,
+    },
+    {
       title: 'Network nodes',
       content: 'Unavailable',
       description: 'Network-wide count needs a node census',

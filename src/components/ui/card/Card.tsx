@@ -18,18 +18,18 @@ export function Card({
   status = 'ready',
 }: CardProps) {
   return (
-    <article className="network-metric" aria-busy={status === 'loading'}>
-      <div className="flex items-center justify-between">
-        <p className="m-0 text-sm font-semibold text-[var(--ink-muted)]">
-          {title}
-        </p>
+    <article className="network-metric-card" aria-busy={status === 'loading'}>
+      <div className="flex items-center justify-center gap-2">
         {Icon1 && (
           <Icon1
-            className="size-4 text-[var(--ink-muted)]"
-            strokeWidth={1.5}
+            className="size-5 text-[var(--ink)]"
+            strokeWidth={1.75}
             aria-hidden="true"
           />
         )}
+        <p className="m-0 text-base font-semibold text-[var(--accent-deep)]">
+          {title}
+        </p>
         {Icon2 && (
           <Icon2
             className="size-4 text-[var(--ink-muted)]"
@@ -39,8 +39,8 @@ export function Card({
       </div>
       {status === 'loading' ? (
         <>
-          <div className="metric-skeleton mt-6 h-8 w-28" />
-          <div className="metric-skeleton mt-4 h-3 w-32" />
+          <div className="metric-skeleton mx-auto mt-6 h-8 w-28" />
+          <div className="metric-skeleton mx-auto mt-4 h-3 w-32" />
         </>
       ) : (
         <>

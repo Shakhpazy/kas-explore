@@ -257,7 +257,7 @@ function ActivityChart({
 
 function ActivitySkeleton() {
   return (
-    <div className="panel animate-pulse min-h-[365px] p-5 sm:p-6">
+    <div className="panel skeleton-panel min-h-[365px] p-5 sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--surface-subtle)]" />

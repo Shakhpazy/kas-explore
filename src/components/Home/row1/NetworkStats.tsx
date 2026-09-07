@@ -5,125 +5,127 @@ import {
   Gauge,
   Layers,
   Network,
-  Pickaxe,
   Timer,
 } from 'lucide-react'
-import { Card } from '@/components/ui/card/Card'
+import type { LucideIcon } from 'lucide-react'
 import { useNetworkCardData } from '@/hooks/useNetworkCardData'
 import { usePublicNodes } from '@/hooks/usePublicNodes'
 
+const DEFAULT_BPS = 10
+
 const metrics = [
-  { title: 'Circulating', label: 'Circulating supply', icon: Coins },
-  { title: 'Hashrate', label: 'Network hashrate', icon: Cpu },
+  { title: 'Live BPS (est.)', label: 'Blocks / sec', icon: Gauge },
+  { title: 'Blue score', label: 'Blue score', icon: Layers },
+  { title: 'Mempool', label: 'Mempool', icon: Activity },
+  { title: 'Hashrate', label: 'Hashrate', icon: Cpu },
+  { title: 'Node status', label: 'Node status', icon: Network },
+  { title: 'Circulating', label: 'Circulating', icon: Coins },
   { title: 'Block reward', label: 'Block reward', icon: Layers },
   { title: 'Next Reduction', label: 'Next reduction', icon: Timer },
-  { title: 'Mempool', label: 'Mempool transactions', icon: Activity },
-  { title: 'Live BPS (est.)', label: 'Blocks per second', icon: Gauge },
 ]
+
+function MetricCell({
+  label,
+  icon: Icon,
+  value,
+  description,
+  status,
+}: {
+  label: string
+  icon: LucideIcon
+  value: string
+  description?: string
+  status: 'ready' | 'loading' | 'error'
+}) {
+  return (
+    <article className="network-stat-cell" aria-busy={status === 'loading'}>
+      <div className="network-stat-label">
+        <Icon className="size-3.5" strokeWidth={1.9} />
+        <span>{label}</span>
+      </div>
+      {status === 'loading' ? (
+        <span className="metric-skeleton mt-3 h-5 w-20" />
+      ) : (
+        <strong className={status === 'error' ? 'text-[var(--ink-muted)]' : ''}>
+          {status === 'error' ? 'Unavailable' : value}
+        </strong>
+      )}
+      <span className="network-stat-description">
+        {status === 'error' ? 'Temporarily unable to refresh' : description}
+      </span>
+    </article>
+  )
+}
 
 export function NetworkStatsCards() {
   const { cards } = useNetworkCardData()
   const nodes = usePublicNodes()
+  const metricData = [
+    ...cards,
+    {
+      title: 'Nodes',
+      content: nodes.data ? nodes.data.count.toLocaleString('en-US') : '—',
+      description: 'Public nodes',
+      isPending: nodes.isPending,
+      isError: nodes.isError,
+    },
+  ]
+  const primary = metricData.find((metric) => metric.title === 'Live BPS (est.)')
+  const primaryValue =
+    primary?.isError
+      ? '—'
+      : primary?.isPending || primary?.content === 'Measuring…'
+        ? DEFAULT_BPS.toString()
+        : primary?.content ?? DEFAULT_BPS.toString()
+  const supportingMetrics = metrics
+    .filter((metric) => metric.title !== 'Live BPS (est.)')
+    .map((metric) => ({
+      ...metric,
+      data: metricData.find((item) => item.title === metric.title),
+    }))
+  supportingMetrics.push({
+    title: 'Nodes',
+    label: 'Nodes',
+    icon: Network,
+    data: metricData.find((item) => item.title === 'Nodes'),
+  })
+
   return (
-    <section className="network-panel" aria-labelledby="network-metrics-title">
-      <header className="network-panel-heading">
-        <div>
-          <p className="eyebrow m-0 mb-2">On-chain telemetry</p>
-          <h2
-            id="network-metrics-title"
-            className="m-0 text-lg font-extrabold tracking-[-.04em]"
-          >
-            Network essentials
-          </h2>
+    <section className="network-overview" aria-label="Network metrics">
+      <header className="network-overview-header">
+        <div className="flex items-center gap-3">
+          <span className="live-panel-icon"><Network className="size-5" /></span>
+          <div>
+            <p className="eyebrow m-0">Network overview</p>
+            <h2>Chain health</h2>
+          </div>
         </div>
-        <Network
-          className="size-5 text-[var(--accent)]"
-          strokeWidth={1.5}
-          aria-hidden="true"
-        />
+        <span className="network-live-indicator">
+          <i /> Live
+        </span>
       </header>
-      <div className="network-metric-grid">
-        {metrics.map(({ title, label, icon }) => {
-          const card = cards.find((item) => item.title === title)
-          if (!card) return null
-          return (
-            <Card
-              key={title}
-              title={label}
-              icon1={icon}
-              status={
-                card.isPending ? 'loading' : card.isError ? 'error' : 'ready'
-              }
-              content={card.isError ? 'Unavailable' : card.content}
-              description={
-                card.isError
-                  ? 'Temporarily unable to refresh'
-                  : card.description
-              }
-            />
-          )
-        })}
-      </div>
-      <footer className="network-coverage">
-        <p className="m-0 text-xs font-bold uppercase tracking-[.12em] text-[var(--ink-muted)]">
-          Coverage
-        </p>
-        <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
-          <span className="inline-flex items-center gap-2 text-sm">
-            <Network className="size-3.5" aria-hidden="true" />
-            Public nodes{' '}
-            <span className="font-semibold" aria-live="polite">
-              {nodes.data
-                ? nodes.data.count.toLocaleString('en-US')
-                : nodes.isPending
-                  ? 'Loading…'
-                  : 'Unavailable'}
-            </span>
-          </span>
-          <span className="inline-flex items-center gap-2 text-sm">
-            <Pickaxe className="size-3.5" aria-hidden="true" />
-            Miners <span className="text-[var(--ink-muted)]">—</span>
-          </span>
+      <div className="network-overview-body">
+        <div className="network-primary">
+          <div className="network-stat-label">
+            <Gauge className="size-4" strokeWidth={1.9} />
+            <span>Blocks per second</span>
+          </div>
+          <strong>{primaryValue}</strong>
+          <p>{primary?.isError ? 'Updating network reading' : primary?.description ?? 'Blocks / sec'}</p>
         </div>
-        <p className="mb-0 mt-2 text-[13px] leading-5 text-[var(--ink-muted)]">
-          <a
-            href="https://nodes.kaspa.ws/"
-            target="_blank"
-            rel="noreferrer"
-            className="underline underline-offset-2"
-          >
-            Kaspa Node Map
-          </a>{' '}
-          · Publicly reachable nodes only.
-          {nodes.data && (
-            <>
-              {' '}
-              Updated{' '}
-              {new Date(nodes.data.updatedAt)
-                .toISOString()
-                .replace('T', ' ')
-                .slice(0, 16)}{' '}
-              UTC.
-            </>
-          )}
-          {nodes.isError && (
-            <>
-              {' '}
-              Unable to refresh.
-              {nodes.data ? ' Showing last received count.' : ''}{' '}
-              <button
-                type="button"
-                className="underline underline-offset-2"
-                onClick={() => void nodes.refetch()}
-                disabled={nodes.isFetching}
-              >
-                Retry
-              </button>
-            </>
-          )}{' '}
-          Network-wide miner counts remain unavailable.
-        </p>
-      </footer>
+        <div className="network-stat-grid">
+          {supportingMetrics.map(({ title, label, icon, data }) => (
+            <MetricCell
+              key={title}
+              label={label}
+              icon={icon}
+              value={data?.content ?? '—'}
+              description={data?.description}
+              status={data?.isPending ? 'loading' : data?.isError ? 'error' : 'ready'}
+            />
+          ))}
+        </div>
+      </div>
     </section>
   )
 }

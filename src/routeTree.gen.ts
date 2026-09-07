@@ -11,8 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AddressesRouteImport } from './routes/addresses'
+import { Route as BlocksRouteImport } from './routes/blocks'
 import { Route as OverviewRouteImport } from './routes/overview'
 import { Route as TransactionsRouteImport } from './routes/transactions'
+import { Route as AddressesAddressRouteImport } from './routes/addresses.$address'
+import { Route as BlocksBlockRouteImport } from './routes/blocks.$block'
+import { Route as TransactionsTransactionRouteImport } from './routes/transactions.$transaction'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AddressesRoute = AddressesRouteImport.update({
   id: '/addresses',
   path: '/addresses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlocksRoute = BlocksRouteImport.update({
+  id: '/blocks',
+  path: '/blocks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OverviewRoute = OverviewRouteImport.update({
@@ -34,39 +43,92 @@ const TransactionsRoute = TransactionsRouteImport.update({
   path: '/transactions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AddressesAddressRoute = AddressesAddressRouteImport.update({
+  id: '/$address',
+  path: '/$address',
+  getParentRoute: () => AddressesRoute,
+} as any)
+const BlocksBlockRoute = BlocksBlockRouteImport.update({
+  id: '/$block',
+  path: '/$block',
+  getParentRoute: () => BlocksRoute,
+} as any)
+const TransactionsTransactionRoute = TransactionsTransactionRouteImport.update({
+  id: '/$transaction',
+  path: '/$transaction',
+  getParentRoute: () => TransactionsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/addresses': typeof AddressesRoute
+  '/addresses': typeof AddressesRouteWithChildren
+  '/blocks': typeof BlocksRouteWithChildren
   '/overview': typeof OverviewRoute
-  '/transactions': typeof TransactionsRoute
+  '/transactions': typeof TransactionsRouteWithChildren
+  '/addresses/$address': typeof AddressesAddressRoute
+  '/blocks/$block': typeof BlocksBlockRoute
+  '/transactions/$transaction': typeof TransactionsTransactionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/addresses': typeof AddressesRoute
+  '/addresses': typeof AddressesRouteWithChildren
+  '/blocks': typeof BlocksRouteWithChildren
   '/overview': typeof OverviewRoute
-  '/transactions': typeof TransactionsRoute
+  '/transactions': typeof TransactionsRouteWithChildren
+  '/addresses/$address': typeof AddressesAddressRoute
+  '/blocks/$block': typeof BlocksBlockRoute
+  '/transactions/$transaction': typeof TransactionsTransactionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/addresses': typeof AddressesRoute
+  '/addresses': typeof AddressesRouteWithChildren
+  '/blocks': typeof BlocksRouteWithChildren
   '/overview': typeof OverviewRoute
-  '/transactions': typeof TransactionsRoute
+  '/transactions': typeof TransactionsRouteWithChildren
+  '/addresses/$address': typeof AddressesAddressRoute
+  '/blocks/$block': typeof BlocksBlockRoute
+  '/transactions/$transaction': typeof TransactionsTransactionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/addresses' | '/overview' | '/transactions'
+  fullPaths:
+    | '/'
+    | '/addresses'
+    | '/blocks'
+    | '/overview'
+    | '/transactions'
+    | '/addresses/$address'
+    | '/blocks/$block'
+    | '/transactions/$transaction'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/addresses' | '/overview' | '/transactions'
-  id: '__root__' | '/' | '/addresses' | '/overview' | '/transactions'
+  to:
+    | '/'
+    | '/addresses'
+    | '/blocks'
+    | '/overview'
+    | '/transactions'
+    | '/addresses/$address'
+    | '/blocks/$block'
+    | '/transactions/$transaction'
+  id:
+    | '__root__'
+    | '/'
+    | '/addresses'
+    | '/blocks'
+    | '/overview'
+    | '/transactions'
+    | '/addresses/$address'
+    | '/blocks/$block'
+    | '/transactions/$transaction'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AddressesRoute: typeof AddressesRoute
+  AddressesRoute: typeof AddressesRouteWithChildren
+  BlocksRoute: typeof BlocksRouteWithChildren
   OverviewRoute: typeof OverviewRoute
-  TransactionsRoute: typeof TransactionsRoute
+  TransactionsRoute: typeof TransactionsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -85,6 +147,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AddressesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blocks': {
+      id: '/blocks'
+      path: '/blocks'
+      fullPath: '/blocks'
+      preLoaderRoute: typeof BlocksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/overview': {
       id: '/overview'
       path: '/overview'
@@ -99,14 +168,71 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TransactionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/addresses/$address': {
+      id: '/addresses/$address'
+      path: '/$address'
+      fullPath: '/addresses/$address'
+      preLoaderRoute: typeof AddressesAddressRouteImport
+      parentRoute: typeof AddressesRoute
+    }
+    '/blocks/$block': {
+      id: '/blocks/$block'
+      path: '/$block'
+      fullPath: '/blocks/$block'
+      preLoaderRoute: typeof BlocksBlockRouteImport
+      parentRoute: typeof BlocksRoute
+    }
+    '/transactions/$transaction': {
+      id: '/transactions/$transaction'
+      path: '/$transaction'
+      fullPath: '/transactions/$transaction'
+      preLoaderRoute: typeof TransactionsTransactionRouteImport
+      parentRoute: typeof TransactionsRoute
+    }
   }
 }
 
+interface AddressesRouteChildren {
+  AddressesAddressRoute: typeof AddressesAddressRoute
+}
+
+const AddressesRouteChildren: AddressesRouteChildren = {
+  AddressesAddressRoute: AddressesAddressRoute,
+}
+
+const AddressesRouteWithChildren = AddressesRoute._addFileChildren(
+  AddressesRouteChildren,
+)
+
+interface BlocksRouteChildren {
+  BlocksBlockRoute: typeof BlocksBlockRoute
+}
+
+const BlocksRouteChildren: BlocksRouteChildren = {
+  BlocksBlockRoute: BlocksBlockRoute,
+}
+
+const BlocksRouteWithChildren =
+  BlocksRoute._addFileChildren(BlocksRouteChildren)
+
+interface TransactionsRouteChildren {
+  TransactionsTransactionRoute: typeof TransactionsTransactionRoute
+}
+
+const TransactionsRouteChildren: TransactionsRouteChildren = {
+  TransactionsTransactionRoute: TransactionsTransactionRoute,
+}
+
+const TransactionsRouteWithChildren = TransactionsRoute._addFileChildren(
+  TransactionsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AddressesRoute: AddressesRoute,
+  AddressesRoute: AddressesRouteWithChildren,
+  BlocksRoute: BlocksRouteWithChildren,
   OverviewRoute: OverviewRoute,
-  TransactionsRoute: TransactionsRoute,
+  TransactionsRoute: TransactionsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

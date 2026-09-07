@@ -40,8 +40,8 @@ export function useNetworkKaspad() {
   return useQuery({
     queryKey: ['network', 'kaspad'],
     queryFn: getNetworkKaspad,
-    refetchInterval: 10_000,
-    staleTime: 5_000,
+    refetchInterval: 1_000,
+    staleTime: 500,
   })
 }
 

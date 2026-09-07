@@ -3,7 +3,7 @@ import { NetworkStatsCards } from '@/components/Home/row1/NetworkStats'
 
 export function Row1() {
   return (
-    <div className="grid items-stretch gap-5 lg:grid-cols-2">
+    <div className="home-overview-grid">
       <NetworkStatsCards />
       <MarketChart />
     </div>
