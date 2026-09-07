@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
+import { DetailSkeleton as SummarySkeleton } from '@/components/ui/DetailSkeleton'
 import { useTransactionInfo } from '@/hooks/useTransactionInfo'
 import { formatDateMedium, formatKasFromSompi, shortHash } from '@/lib/utils'
 
@@ -12,21 +13,21 @@ function isTransactionId(value: string) {
   return /^[a-f0-9]{64}$/i.test(value.trim().replace(/^0x/i, ''))
 }
 
-function SkeletonRow() {
-  return (
-    <tr aria-hidden="true">
-      <td><span className="address-skeleton h-3 w-12" /></td>
-      <td><span className="address-skeleton h-3 w-[16rem]" /></td>
-      <td><span className="address-skeleton h-3 w-[5rem]" /></td>
-    </tr>
-  )
-}
-
 function DetailSkeleton() {
   return (
-    <div className="transaction-detail-skeleton">
-      Loading transaction details…
-    </div>
+    <section className="transaction-detail" role="status" aria-label="Loading transaction details" aria-busy="true">
+      <article className="transaction-summary"><SummarySkeleton /></article>
+      <div className="transaction-flow-grid">
+        {['Inputs', 'Outputs'].map((label) => (
+          <section key={label} className="transaction-io" aria-hidden="true">
+            <header><h2>{label}</h2></header>
+            <div className="p-5 space-y-5">
+              {Array.from({ length: 5 }, (_, index) => <span key={index} className="metric-skeleton h-4 w-full" />)}
+            </div>
+          </section>
+        ))}
+      </div>
+    </section>
   )
 }
 

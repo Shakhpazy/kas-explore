@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Blocks, Copy } from 'lucide-react'
+import { DetailSkeleton } from '@/components/ui/DetailSkeleton'
 import { useBlockInfo } from '@/hooks/useBlockInfo'
 import { formatDateMedium, formatKasFromSompi, shortHash } from '@/lib/utils'
 
@@ -17,16 +18,11 @@ export function BlockDetails({ hash }: { hash: string }) {
   if (query.isPending)
     return (
       <div
-        className="transaction-summary mt-6 p-6"
+        className="transaction-summary mt-6"
         aria-label="Loading block details"
         aria-busy="true"
       >
-        <span className="metric-skeleton block h-8 w-60" />
-        <div className="mt-6 grid grid-cols-2 gap-6">
-          {Array.from({ length: 6 }, (_, index) => (
-            <span key={index} className="metric-skeleton block h-12 w-full" />
-          ))}
-        </div>
+        <DetailSkeleton cells={8} />
       </div>
     )
   if (!query.data)

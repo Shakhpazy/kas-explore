@@ -82,7 +82,8 @@ export function LiveBlocksPanel() {
                 <th className="text-right">Total amount</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody aria-busy={live.status === 'connecting'}>
+              {live.status === 'connecting' && blocks.length === 0 && <LiveSkeletonRows />}
               {blocks
                 .slice(
                   activeBlocksPage * PAGE_SIZE,
@@ -123,8 +124,8 @@ export function LiveBlocksPanel() {
             </tbody>
           </table>
           <EmptyState
-            show={blocks.length === 0}
-            label="Reading the current BlockDAG tips…"
+            show={blocks.length === 0 && live.status !== 'connecting'}
+            label={live.status === 'offline' ? 'Block data is unavailable. Retrying automatically…' : 'No recent blocks available.'}
           />
         </div>
         <Pagination
@@ -191,7 +192,8 @@ export function LiveTransactionsPanel() {
               <th className="text-right">Amount</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody aria-busy={live.status === 'connecting'}>
+            {live.status === 'connecting' && transactions.length === 0 && <LiveSkeletonRows />}
             {transactions
               .slice(activePage * PAGE_SIZE, (activePage + 1) * PAGE_SIZE)
               .map((transaction) => (
@@ -234,8 +236,8 @@ export function LiveTransactionsPanel() {
           </tbody>
         </table>
         <EmptyState
-          show={transactions.length === 0}
-          label="Reading the latest accepted transactions…"
+          show={transactions.length === 0 && live.status !== 'connecting'}
+          label={live.status === 'offline' ? 'Transaction data is unavailable. Retrying automatically…' : 'No recent transactions available.'}
         />
       </div>
       <Pagination
@@ -395,6 +397,17 @@ function useFrozenRows<T>(rows: T[], paused: boolean) {
   }, [paused, rows])
 
   return visibleRows
+}
+
+function LiveSkeletonRows() {
+  return Array.from({ length: PAGE_SIZE }, (_, index) => (
+    <tr key={index} aria-hidden="true">
+      <td><span className="metric-skeleton h-3 w-full max-w-24" /></td>
+      <td><span className="metric-skeleton h-3 w-full max-w-40" /></td>
+      <td><span className="metric-skeleton h-3 w-full max-w-32" /></td>
+      <td className="text-right"><span className="metric-skeleton h-5 w-20" /></td>
+    </tr>
+  ))
 }
 
 function EmptyState({ show, label }: { show: boolean; label: string }) {

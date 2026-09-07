@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Search, Zap } from 'lucide-react'
+import { Zap } from 'lucide-react'
 import ThemeToggle from './ThemeToggle'
 
 const links = [
@@ -7,6 +7,7 @@ const links = [
   ['/addresses', 'Addresses'],
   ['/transactions', 'Transactions'],
   ['/blocks', 'Blocks'],
+  ['/blockdag', 'BlockDAG'],
 ] as const
 export default function Header() {
   return (

@@ -1,4 +1,5 @@
 import { Copy, WalletCards } from 'lucide-react'
+import { DetailSkeleton } from '@/components/ui/DetailSkeleton'
 import { AddressTransactions } from '@/components/Address/AddressTransactions'
 import { useAddressInfo } from '@/hooks/useAddressInfo'
 import { useKaspaMarketChart } from '@/hooks/useMarket'
@@ -49,9 +50,7 @@ export function AddressDetail({ address }: { address: string }) {
           </button>
         </header>
         {info.isPending ? (
-          <div className="grid min-h-40 place-items-center text-sm text-[var(--ink-muted)]">
-            Loading address data…
-          </div>
+          <DetailSkeleton kind="address" cells={4} />
         ) : info.isError ? (
           <div className="grid min-h-40 place-items-center px-6 text-center text-sm text-[var(--danger)]">
             This address could not be loaded from the Kaspa API.
@@ -63,7 +62,7 @@ export function AddressDetail({ address }: { address: string }) {
               <strong className="kas-amount">
                 {formatKasFromSompi(info.data.balanceSompi, 8)}
               </strong>
-              <span>{formatUsd(info.data.balanceSompi, kasPrice)}</span>
+              {market.isPending ? <span className="metric-skeleton h-4 w-24" aria-label="Loading USD balance" /> : <span>{formatUsd(info.data.balanceSompi, kasPrice)}</span>}
             </div>
             <dl className="address-stat-grid">
               <div>
