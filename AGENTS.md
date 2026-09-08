@@ -95,3 +95,7 @@ tanstackIntent:
     run: "npx @tanstack/intent@latest load @tanstack/virtual-file-routes#virtual-file-routes"
     for: "Programmatic route tree building as an alternative to filesystem conventions: rootRoute, index, route, layout, physical, defineVirtualSubtreeConfig. Use with TanStack Router plugin's virtualRouteConfig option."
 <!-- intent-skills:end -->
+
+## Playwright testing
+
+For any Playwright test creation, updates, or debugging, first read `.claude/skills/playwright-cli/SKILL.md`. Read the relevant files in `.claude/skills/playwright-cli/references/` before using the related Playwright feature.
