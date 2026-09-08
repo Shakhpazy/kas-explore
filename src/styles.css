@@ -1367,7 +1367,7 @@ a {
   height: 2px;
   left: 0;
   right: 0;
-  bottom: -10px;
+  bottom: -2px;
   background: var(--accent);
 }
 .reveal {
