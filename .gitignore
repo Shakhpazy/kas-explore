@@ -13,3 +13,4 @@ __unconfig*
 todos.json
 # Playwright CLI output (may contain credentials)
 .playwright-cli/
+TODO.txt

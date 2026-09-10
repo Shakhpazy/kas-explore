@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Menu, X, Zap } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import ThemeToggle from './ThemeToggle'
 
@@ -21,11 +21,9 @@ export default function Header() {
       >
         <div className="flex w-full items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 no-underline">
-            <span className="grid size-8 place-items-center rounded-[10px] bg-[var(--ink)] text-[var(--canvas)]">
-              <Zap className="size-4 fill-current" />
-            </span>
+            <img src="/favicon.svg" alt="Kaspa" className="size-8" />
             <span className="text-[15px] font-extrabold tracking-[-.05em]">
-              kas<span className="text-[var(--accent)]">explore</span>
+              Kas<span className="text-[var(--accent)]">Explore</span>
             </span>
           </Link>
           <div className="hidden items-center gap-5 md:flex">
